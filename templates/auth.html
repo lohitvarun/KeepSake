@@ -1,0 +1,13 @@
+{% extends "base.html" %}{% block title %}{{ 'Create your account' if mode=='signup' else 'Welcome back' }}{% endblock %}
+{% block auth %}<main class="auth-page"><div class="auth-art"><div class="auth-art-inner"><span class="brand-mark large">✦</span><p class="eyebrow">A LITTLE SPACE, JUST FOR YOU</p><h1>Your story<br><em>belongs here.</em></h1><p class="muted">Keep the moments, thoughts and little details you never want to lose.</p><div class="quote">“Every day is a page in your story.”</div></div></div>
+<div class="auth-panel"><a class="brand" href="/"><span class="brand-mark">✦</span><span>Keepsake</span></a><div class="auth-form"><p class="eyebrow">{{ 'START YOUR JOURNAL' if mode=='signup' else 'YOUR JOURNAL AWAITS' }}</p><h2>{{ 'Create your account' if mode=='signup' else 'Welcome back' }}</h2><p class="muted">{{ 'A quiet place to collect your life.' if mode=='signup' else 'Sign in to continue your story.' }}</p>
+<form method="post">
+{% if mode=='signup' %}
+<label>Your name<input name="name" required maxlength="80" placeholder="How should we call you?"></label>
+<div class="form-row"><label>Date of birth<input type="date" name="dob" required max="{{ '' }}"></label><label>Gender<select name="gender"><option>Prefer not to say</option><option>Male</option><option>Female</option><option>Non-binary</option></select></label></div>
+{% endif %}
+<label>Email address<input type="email" name="email" required placeholder="you@example.com" autocomplete="email"></label>
+<label>Password<input type="password" name="password" required minlength="8" placeholder="At least 8 characters" autocomplete="{{ 'new-password' if mode=='signup' else 'current-password' }}"></label>
+{% if mode=='signup' %}<label>Re-enter password<input type="password" name="confirm" required minlength="8" placeholder="Enter your password again"></label>{% endif %}
+<button class="button full" type="submit">{{ 'Create account' if mode=='signup' else 'Sign in' }} <span>→</span></button></form>
+<p class="auth-switch">{% if mode=='signup' %}Already have an account? <a href="{{ url_for('login') }}">Sign in</a>{% else %}New to Keepsake? <a href="{{ url_for('signup') }}">Create an account</a>{% endif %}</p><small class="muted">Your entries are private by default. Never share your password.</small></div></div></main>{% endblock %}

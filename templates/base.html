@@ -1,0 +1,32 @@
+<!doctype html><html lang="en" data-theme="{{ theme|default('light') }}"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{% block title %}Keepsake{% endblock %} · Keepsake</title>
+<link rel="stylesheet" href="{{ url_for('static',filename='css/style.css') }}"></head>
+<body>
+{% if session.get('user_id') %}
+<div class="app-shell"><aside class="sidebar" id="sidebar">
+<a class="brand" href="{{ url_for('dashboard') }}"><span class="brand-mark">✦</span><span>Keepsake</span></a>
+<div class="side-label">YOUR SPACE</div>
+<nav>
+<a href="{{ url_for('dashboard') }}">⌂ <span>Overview</span></a>
+<a href="{{ url_for('diary') }}">▤ <span>My diary</span></a>
+<a href="{{ url_for('calendar') }}">▦ <span>Calendar</span></a>
+<a href="{{ url_for('memories') }}">♡ <span>Memories</span></a>
+<a href="{{ url_for('mood_page') }}">☼ <span>Mood tracker</span></a>
+<a href="{{ url_for('folders') }}">▣ <span>Collections</span></a>
+<a href="{{ url_for('goals') }}">✧ <span>Goals & dreams</span></a>
+<a href="{{ url_for('bucket') }}">✓ <span>Bucket list</span></a>
+<a href="{{ url_for('prompts') }}">✎ <span>Daily prompts</span></a>
+<a href="{{ url_for('statistics') }}">▥ <span>Statistics</span></a>
+<a href="{{ url_for('trash') }}">⌫ <span>Recently deleted</span></a>
+<div class="side-label">PREFERENCES</div>
+<a href="{{ url_for('reminders') }}">◷ <span>Reminders</span></a>
+<a href="{{ url_for('privacy') }}">♧ <span>Privacy & sharing</span></a>
+<a href="{{ url_for('import_data') }}">⇅ <span>Import & export</span></a>
+<a href="{{ url_for('settings') }}">⚙ <span>Settings</span></a>
+</nav><div class="sidebar-bottom"><div class="avatar">{{ (session.get('user_name') or 'Y')[0]|upper }}</div><div><b>Your private space</b><small>Only you can see your diary</small></div></div>
+</aside><main class="main"><header class="topbar"><button class="icon-btn mobile-menu" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button><div class="crumb">A space for your story</div><div class="top-actions"><button class="icon-btn" id="themeToggle" title="Toggle theme">◐</button><a class="button small" href="{{ url_for('editor') }}">＋ New entry</a><a class="icon-btn" href="{{ url_for('logout') }}" title="Log out">↗</a></div></header>
+{% with messages=get_flashed_messages(with_categories=true) %}{% if messages %}<div class="flash-wrap">{% for category,message in messages %}<div class="flash {{ category }}">{{ message }}</div>{% endfor %}</div>{% endif %}{% endwith %}
+<section class="content">{% block content %}{% endblock %}</section></main></div>
+{% else %}{% with messages=get_flashed_messages(with_categories=true) %}{% if messages %}<div class="flash-wrap auth-flashes">{% for category,message in messages %}<div class="flash {{ category }}">{{ message }}</div>{% endfor %}</div>{% endif %}{% endwith %}{% block auth %}{% endblock %}{% endif %}
+<script src="{{ url_for('static',filename='js/main.js') }}"></script></body></html>

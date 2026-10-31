@@ -1,0 +1,1 @@
+{% extends "base.html" %}{% block title %}Shared entry{% endblock %}{% block content %}<article class="public-entry"><p class="eyebrow">A KEEPSAKE SHARED WITH YOU</p><h1>{{ entry['title'] }}</h1><p class="muted">{{ entry['entry_date'] }} · Shared by {{ entry['name'] }}</p><div class="public-content">{{ entry['content']|safe }}</div></article>{% endblock %}

@@ -1,0 +1,73 @@
+import sqlite3
+from config import DATABASE
+
+SCHEMA = """
+PRAGMA foreign_keys = ON;
+CREATE TABLE IF NOT EXISTS users (
+ id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, dob TEXT NOT NULL,
+ gender TEXT NOT NULL, email TEXT NOT NULL UNIQUE, password_hash TEXT NOT NULL,
+ created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE IF NOT EXISTS user_settings (
+ user_id INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+ theme TEXT NOT NULL DEFAULT 'light', accent TEXT NOT NULL DEFAULT '#8D7863',
+ preferences TEXT NOT NULL DEFAULT '{}'
+);
+CREATE TABLE IF NOT EXISTS folders (
+ id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+ name TEXT NOT NULL, icon TEXT DEFAULT '📁', created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE IF NOT EXISTS diary_entries (
+ id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+ folder_id INTEGER REFERENCES folders(id) ON DELETE SET NULL, title TEXT NOT NULL,
+ content TEXT NOT NULL DEFAULT '', entry_date TEXT NOT NULL, category TEXT DEFAULT 'Personal Life',
+ mood TEXT DEFAULT '', tags TEXT DEFAULT '', pinned INTEGER DEFAULT 0, favourite INTEGER DEFAULT 0,
+ archived INTEGER DEFAULT 0, deleted INTEGER DEFAULT 0, created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+ updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE IF NOT EXISTS moods (
+ id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+ mood TEXT NOT NULL, note TEXT DEFAULT '', mood_date TEXT NOT NULL,
+ UNIQUE(user_id,mood_date)
+);
+CREATE TABLE IF NOT EXISTS memories (
+ id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+ title TEXT NOT NULL, caption TEXT DEFAULT '', memory_date TEXT NOT NULL, location TEXT DEFAULT '',
+ filename TEXT DEFAULT '', created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE IF NOT EXISTS calendar_events (
+ id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+ title TEXT NOT NULL, event_date TEXT NOT NULL, description TEXT DEFAULT ''
+);
+CREATE TABLE IF NOT EXISTS goals (
+ id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+ title TEXT NOT NULL, description TEXT DEFAULT '', target_date TEXT DEFAULT '',
+ progress INTEGER DEFAULT 0, completed INTEGER DEFAULT 0
+);
+CREATE TABLE IF NOT EXISTS bucket_list (
+ id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+ title TEXT NOT NULL, category TEXT DEFAULT 'Personal', target_date TEXT DEFAULT '', completed INTEGER DEFAULT 0
+);
+CREATE TABLE IF NOT EXISTS reminders (
+ id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+ title TEXT NOT NULL, remind_date TEXT NOT NULL, done INTEGER DEFAULT 0
+);
+CREATE TABLE IF NOT EXISTS shares (
+ id INTEGER PRIMARY KEY AUTOINCREMENT, entry_id INTEGER NOT NULL REFERENCES diary_entries(id) ON DELETE CASCADE,
+ owner_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE, token TEXT NOT NULL UNIQUE,
+ expires_on TEXT DEFAULT '', created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_entries_user_date ON diary_entries(user_id, entry_date);
+CREATE INDEX IF NOT EXISTS idx_entries_user_deleted ON diary_entries(user_id, deleted);
+"""
+
+def get_db():
+    conn = sqlite3.connect(DATABASE)
+    conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA foreign_keys = ON")
+    return conn
+
+def init_db():
+    DATABASE.parent.mkdir(parents=True, exist_ok=True)
+    with get_db() as db:
+        db.executescript(SCHEMA)

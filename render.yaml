@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: keepsake-diary
+    runtime: python
+    plan: starter
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
+    envVars:
+      - key: DIARY_SECRET_KEY
+        generateValue: true
+      - key: DATA_DIR
+        value: /var/data
+    disk:
+      name: keepsake-data
+      mountPath: /var/data
+      sizeGB: 1
